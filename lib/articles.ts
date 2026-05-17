@@ -18,15 +18,23 @@ export interface Article {
 const ARTICLES_DIR = path.join(process.cwd(), "content", "articles");
 
 function processBody(raw: string): string {
-  // Replace [CTA] and [CTA: any text] variants
-  let body = raw.replace(/\[CTA[^\]]*\]/gi, CTA_HTML);
+  // Strip META and KEYWORDS lines
+  let body = raw
+    .replace(/^META:.*$/gm, "")
+    .replace(/^KEYWORDS:.*$/gm, "")
+    .trim();
 
-  // If body looks like markdown (has ## headers), convert to HTML
-  if (body.includes("## ") || body.includes("### ") || body.startsWith("# ")) {
-    body = marked.parse(body) as string;
-    // Re-replace CTAs that may have been in markdown
-    body = body.replace(/\[CTA[^\]]*\]/gi, CTA_HTML);
-  }
+  // Always parse as markdown (handles both HTML and markdown output from AI)
+  body = marked.parse(body) as string;
+
+  // Replace all CTA variants: [CTA], [CTA: text], **CTA text**, etc.
+  body = body.replace(/\[CTA[^\]]*\]/gi, CTA_HTML);
+
+  // Replace bold CTA patterns like **Get a Free Quote from 1-800-GOT-JUNK?**
+  body = body.replace(/<strong>Get a Free Quote from 1-800-GOT-JUNK\?<\/strong>/gi, CTA_HTML);
+  body = body.replace(/<strong>Book 1-800-GOT-JUNK\? Now<\/strong>/gi, CTA_HTML);
+  body = body.replace(/<p><strong>Get a Free Quote[^<]*<\/strong><\/p>/gi, `<p>${CTA_HTML}</p>`);
+  body = body.replace(/<p><strong>Book 1-800-GOT-JUNK[^<]*<\/strong><\/p>/gi, `<p>${CTA_HTML}</p>`);
 
   return body;
 }
