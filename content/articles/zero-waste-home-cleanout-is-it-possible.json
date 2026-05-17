@@ -4,6 +4,6 @@
   "metaDescription": "",
   "keywords": [],
   "body": "",
-  "generatedAt": "2026-05-17T15:08:43.255Z",
-  "error": "429 Requests per minute limit exceeded - too many requests sent."
+  "generatedAt": "2026-05-17T19:18:06.070Z",
+  "error": "429 Requests per hour limit exceeded - too many requests sent."
 }

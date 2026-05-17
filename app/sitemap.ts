@@ -2,7 +2,7 @@ import { getAllSlugs } from "@/lib/articles";
 import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://1800gotjunkguide.vercel.app";
+  const base = "https://1800gotjunksite.vercel.app";
   return [
     { url: base, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
     ...getAllSlugs().map((slug) => ({
