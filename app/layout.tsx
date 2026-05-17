@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -21,8 +20,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={geist.variable}>
       <head>
-        <Script src="https://www.googletagmanager.com/gtag/js?id=G-92EGLRQFMM" strategy="afterInteractive" />
-        <Script id="ga-init" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-92EGLRQFMM');`}</Script>
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-92EGLRQFMM"></script>
+        <script dangerouslySetInnerHTML={{ __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-92EGLRQFMM');` }} />
       </head>
       <body className="min-h-screen bg-white text-gray-900 antialiased">
         <header className="border-b border-gray-100 bg-white sticky top-0 z-10">
