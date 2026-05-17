@@ -9,9 +9,32 @@ export const metadata: Metadata = {
   description: "500+ honest guides about 1-800-GOT-JUNK? — pricing, reviews, what they take, comparisons, and tips to save money on junk removal.",
 };
 
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "1800GotJunk Guide",
+  url: "https://1800gotjunkguide.vercel.app",
+  description: "Honest reviews, pricing guides, and tips for 1-800-GOT-JUNK? junk removal service.",
+  potentialAction: {
+    "@type": "SearchAction",
+    target: "https://1800gotjunkguide.vercel.app/?q={search_term_string}",
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "1800GotJunk Guide",
+  url: "https://1800gotjunkguide.vercel.app",
+};
+
 export default function HomePage() {
   const articles = getAllArticles();
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
     <div className="max-w-5xl mx-auto px-4 py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">The Complete 1-800-GOT-JUNK? Resource</h1>
@@ -54,5 +77,6 @@ export default function HomePage() {
         </div>
       )}
     </div>
+    </>
   );
 }
