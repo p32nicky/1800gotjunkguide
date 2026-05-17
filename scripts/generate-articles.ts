@@ -1,0 +1,478 @@
+/**
+ * Generates 500 SEO articles about 1-800-GOT-JUNK? using Groq + Cerebras fallback.
+ * Run: npx tsx scripts/generate-articles.ts (keys loaded from .env.local)
+ */
+
+import Groq from "groq-sdk";
+import fs from "fs";
+import path from "path";
+
+const AFFILIATE = "https://click.linksynergy.com/fs-bin/click?id=EWtL65s2/tg&offerid=1950775.2&type=3&subid=0";
+
+const ARTICLE_TOPICS = [
+  // Core reviews & pricing
+  "1-800-GOT-JUNK Review: Is It Worth the Price?",
+  "1-800-GOT-JUNK Pricing: How Much Does It Cost?",
+  "1-800-GOT-JUNK Cost Breakdown: What to Expect",
+  "Is 1-800-GOT-JUNK Expensive? Honest Price Analysis",
+  "1-800-GOT-JUNK vs Hiring a Dumpster: Which Is Cheaper?",
+  "1-800-GOT-JUNK vs LoadUp: Which Is Better?",
+  "1-800-GOT-JUNK vs Junk King: Full Comparison",
+  "1-800-GOT-JUNK vs College Hunks: Who Wins?",
+  "1-800-GOT-JUNK vs Two Men and a Truck: Comparison",
+  "1-800-GOT-JUNK vs Local Junk Removal: Pros and Cons",
+  "1-800-GOT-JUNK Alternatives: Best Options",
+  "1-800-GOT-JUNK Reviews: What Customers Say",
+  "1-800-GOT-JUNK Yelp Reviews: Are They Legit?",
+  "1-800-GOT-JUNK Reddit Reviews: What People Think",
+  "Is 1-800-GOT-JUNK Legit? Full Investigation",
+  "1-800-GOT-JUNK Better Business Bureau Rating Explained",
+  "1-800-GOT-JUNK Pros and Cons: Honest Assessment",
+  "1-800-GOT-JUNK Same Day Service: How It Works",
+  "How to Get a Discount on 1-800-GOT-JUNK",
+  "1-800-GOT-JUNK Coupon Codes: Do They Exist?",
+
+  // What they take
+  "What Does 1-800-GOT-JUNK Take? Complete List",
+  "What Will 1-800-GOT-JUNK NOT Take?",
+  "Does 1-800-GOT-JUNK Take Mattresses?",
+  "Does 1-800-GOT-JUNK Take Electronics?",
+  "Does 1-800-GOT-JUNK Take Appliances?",
+  "Does 1-800-GOT-JUNK Take Furniture?",
+  "Does 1-800-GOT-JUNK Take Hazardous Waste?",
+  "Does 1-800-GOT-JUNK Take Paint?",
+  "Does 1-800-GOT-JUNK Take Tires?",
+  "Does 1-800-GOT-JUNK Take Refrigerators?",
+  "Does 1-800-GOT-JUNK Take Hot Tubs?",
+  "Does 1-800-GOT-JUNK Take Pianos?",
+  "Does 1-800-GOT-JUNK Take Yard Waste?",
+  "Does 1-800-GOT-JUNK Take Construction Debris?",
+  "Does 1-800-GOT-JUNK Take Old TVs?",
+  "Does 1-800-GOT-JUNK Take Clothes and Donations?",
+  "Does 1-800-GOT-JUNK Take Concrete?",
+  "Does 1-800-GOT-JUNK Take Shed Debris?",
+  "Does 1-800-GOT-JUNK Take Medical Equipment?",
+  "Does 1-800-GOT-JUNK Take Exercise Equipment?",
+
+  // Use cases
+  "1-800-GOT-JUNK for Moving: What You Need to Know",
+  "1-800-GOT-JUNK for Estate Cleanouts: Complete Guide",
+  "1-800-GOT-JUNK for Hoarding Cleanouts",
+  "1-800-GOT-JUNK for Home Renovation Cleanup",
+  "1-800-GOT-JUNK for Garage Cleanouts",
+  "1-800-GOT-JUNK for Basement Cleanouts",
+  "1-800-GOT-JUNK for Attic Cleanouts",
+  "1-800-GOT-JUNK for Office Cleanouts",
+  "1-800-GOT-JUNK for Foreclosure Cleanouts",
+  "1-800-GOT-JUNK for Rental Property Cleanouts",
+  "1-800-GOT-JUNK for Storage Unit Cleanouts",
+  "1-800-GOT-JUNK for Deck and Fence Removal",
+  "1-800-GOT-JUNK for Shed Removal",
+  "1-800-GOT-JUNK for Hot Tub Removal",
+  "1-800-GOT-JUNK for Pool Removal",
+  "1-800-GOT-JUNK for Old Furniture Removal",
+  "1-800-GOT-JUNK for Appliance Removal",
+  "1-800-GOT-JUNK for Electronics Recycling",
+  "1-800-GOT-JUNK for Spring Cleaning",
+  "1-800-GOT-JUNK for Post-Party Cleanup",
+
+  // How it works
+  "How Does 1-800-GOT-JUNK Work? Step by Step",
+  "How to Book 1-800-GOT-JUNK Online",
+  "What to Expect on 1-800-GOT-JUNK Appointment Day",
+  "How 1-800-GOT-JUNK Calculates Price",
+  "1-800-GOT-JUNK Truck Sizes: Which One Do You Need?",
+  "1-800-GOT-JUNK Minimum Load: What Is It?",
+  "1-800-GOT-JUNK Full Truck Load: What Fits?",
+  "Does 1-800-GOT-JUNK Give Upfront Pricing?",
+  "How to Prepare for 1-800-GOT-JUNK Pickup",
+  "Can You Negotiate 1-800-GOT-JUNK Prices?",
+  "1-800-GOT-JUNK Payment Methods: What They Accept",
+  "Does 1-800-GOT-JUNK Recycle?",
+  "What Does 1-800-GOT-JUNK Do With Your Junk?",
+  "1-800-GOT-JUNK Donation Policy: What Gets Donated?",
+  "How 1-800-GOT-JUNK Is Eco-Friendly",
+  "1-800-GOT-JUNK vs DIY Junk Removal: What's Better?",
+  "Is 1-800-GOT-JUNK Insured?",
+  "Does 1-800-GOT-JUNK Do Heavy Lifting?",
+  "Can 1-800-GOT-JUNK Access Tight Spaces?",
+  "Does 1-800-GOT-JUNK Disassemble Furniture?",
+
+  // Location specific (generic)
+  "1-800-GOT-JUNK Near Me: How to Find a Location",
+  "1-800-GOT-JUNK Service Areas: Full List",
+  "1-800-GOT-JUNK in New York City",
+  "1-800-GOT-JUNK in Los Angeles",
+  "1-800-GOT-JUNK in Chicago",
+  "1-800-GOT-JUNK in Houston",
+  "1-800-GOT-JUNK in Phoenix",
+  "1-800-GOT-JUNK in Philadelphia",
+  "1-800-GOT-JUNK in San Antonio",
+  "1-800-GOT-JUNK in Dallas",
+  "1-800-GOT-JUNK in San Diego",
+  "1-800-GOT-JUNK in San Jose",
+  "1-800-GOT-JUNK in Austin",
+  "1-800-GOT-JUNK in Jacksonville",
+  "1-800-GOT-JUNK in Seattle",
+  "1-800-GOT-JUNK in Denver",
+  "1-800-GOT-JUNK in Boston",
+  "1-800-GOT-JUNK in Nashville",
+  "1-800-GOT-JUNK in Miami",
+  "1-800-GOT-JUNK in Atlanta",
+
+  // Decluttering guides
+  "How to Declutter Your Home Before Calling 1-800-GOT-JUNK",
+  "What to Keep vs Throw Away When Decluttering",
+  "How to Declutter a Garage in One Weekend",
+  "How to Declutter a Basement Step by Step",
+  "How to Declutter an Attic Without Losing Your Mind",
+  "How to Declutter After a Divorce",
+  "How to Declutter After a Death in the Family",
+  "How to Declutter Before Moving",
+  "How to Declutter a Hoarder's Home",
+  "How to Declutter When You're Overwhelmed",
+  "Best Decluttering Methods That Actually Work",
+  "The KonMari Method: Does It Work for Junk Removal?",
+  "How to Donate vs Dump: Making the Right Choice",
+  "Decluttering vs Minimalism: What's the Difference?",
+  "How Often Should You Declutter Your Home?",
+  "Room by Room Decluttering Guide",
+  "How to Declutter Sentimental Items",
+  "How to Get Kids to Help Declutter",
+  "Decluttering Tips for Seniors",
+  "How to Declutter When You Have No Time",
+
+  // Junk removal tips
+  "How to Save Money on Junk Removal",
+  "Best Time to Hire Junk Removal Services",
+  "How to Prepare for Junk Removal Day",
+  "Things Junk Removal Won't Take: What to Do Instead",
+  "Free Junk Removal Options Near You",
+  "How to Dispose of Old Furniture for Free",
+  "How to Get Rid of Old Appliances",
+  "How to Dispose of Old Electronics Responsibly",
+  "How to Get Rid of a Mattress",
+  "How to Get Rid of Old Tires",
+  "How to Dispose of Old Paint",
+  "How to Dispose of Hazardous Household Waste",
+  "How to Get Rid of Large Items Without a Truck",
+  "Junk Removal vs Dumpster Rental: Which to Choose?",
+  "How to Choose a Junk Removal Company",
+  "Red Flags When Hiring Junk Removal Services",
+  "Questions to Ask Before Hiring Junk Removal",
+  "How to Read Junk Removal Quotes",
+  "DIY Junk Removal Tips to Save Money",
+  "When Is It Worth Hiring Professionals for Junk Removal?",
+
+  // Specific item removal guides
+  "How to Get Rid of Old Sofas and Couches",
+  "How to Dispose of a Refrigerator",
+  "How to Get Rid of an Old Washing Machine",
+  "How to Dispose of an Old Dryer",
+  "How to Get Rid of a Broken Dishwasher",
+  "How to Dispose of Old Computers and Laptops",
+  "How to Get Rid of Old TVs",
+  "How to Dispose of Old Cell Phones",
+  "How to Get Rid of Broken Exercise Equipment",
+  "How to Dispose of Old Bicycles",
+  "How to Get Rid of Old Carpets and Rugs",
+  "How to Dispose of Old Windows and Doors",
+  "How to Get Rid of Old Cabinets",
+  "How to Dispose of Old Bookshelves",
+  "How to Get Rid of Old Desks and Office Furniture",
+  "How to Dispose of Old Grills and BBQs",
+  "How to Get Rid of Old Lawn Mowers",
+  "How to Dispose of Old Water Heaters",
+  "How to Get Rid of Broken Trampolines",
+  "How to Dispose of Old Swing Sets",
+
+  // Real estate and property
+  "Junk Removal for Real Estate Agents: Complete Guide",
+  "How to Clean Out a Property Before Selling",
+  "Estate Sale vs Junk Removal: Which First?",
+  "How to Handle a Hoarder House Before Selling",
+  "Junk Removal for Landlords: Tenant Cleanouts",
+  "How to Clean Out a Rental Property Fast",
+  "Foreclosure Cleanout Services: What to Know",
+  "How to Handle Abandoned Property Cleanout",
+  "Junk Removal for Property Flippers",
+  "How to Stage a Home After Junk Removal",
+  "Clearing Junk Increases Home Value: How Much?",
+  "How to Prepare an Estate for Sale",
+  "Probate Cleanouts: A Step-by-Step Guide",
+  "How to Hire Help for Estate Cleanouts",
+  "Commercial Property Cleanouts: What to Know",
+  "Office Furniture Removal Services",
+  "Restaurant Equipment Removal Guide",
+  "Retail Store Cleanout Services",
+  "Warehouse Cleanout: How to Handle Large Volumes",
+  "How to Handle Construction Site Cleanup",
+
+  // Seasonal and situational
+  "Spring Cleaning with 1-800-GOT-JUNK",
+  "Fall Decluttering: How to Prepare Your Home",
+  "How to Clean Out After the Holidays",
+  "Post-Renovation Cleanup: What to Do with Debris",
+  "How to Clean Out a Home After a Natural Disaster",
+  "Storm Debris Removal: What You Need to Know",
+  "Flood Damage Cleanup and Junk Removal",
+  "Fire Damage Cleanup: Removing Debris Safely",
+  "How to Handle Junk After a Major Life Event",
+  "Downsizing Your Home: A Junk Removal Guide",
+  "Empty Nesters Guide to Decluttering",
+  "Retirement Downsizing: How to Let Go of Stuff",
+  "Moving to a Smaller Home: What to Toss",
+  "How to Declutter Before a Big Move",
+  "Last-Minute Moving Cleanout Tips",
+  "How to Deal with a Deceased Parent's Belongings",
+  "Grief and Decluttering: Taking It Step by Step",
+  "How to Handle Junk When a Roommate Moves Out",
+  "Divorce Cleanout: How to Fairly Divide and Remove",
+  "How to Handle Clutter After a Breakup",
+
+  // Comparisons with other disposal methods
+  "Junk Removal vs Dumpster Rental: Full Comparison",
+  "Junk Removal vs Selling on Facebook Marketplace",
+  "Junk Removal vs Goodwill Donation",
+  "Junk Removal vs Habitat for Humanity ReStore",
+  "Junk Removal vs Curbside Bulk Pickup",
+  "Junk Removal vs Municipal Waste Facility",
+  "Junk Removal vs Selling at a Garage Sale",
+  "Junk Removal vs Hiring Day Laborers",
+  "Full-Service vs Self-Serve Junk Removal",
+  "Is Junk Removal Tax Deductible?",
+
+  // Business and commercial
+  "Commercial Junk Removal: What Businesses Need to Know",
+  "Office Cleanout Services: How to Plan One",
+  "How to Handle Electronic Waste for Businesses",
+  "Retail Store Closeout Junk Removal",
+  "Restaurant Closing Cleanout Guide",
+  "Medical Office Cleanout: Special Considerations",
+  "How to Handle Confidential Document Disposal",
+  "Gym Equipment Removal for Businesses",
+  "Hotel Renovation Junk Removal",
+  "School and University Cleanout Services",
+
+  // Sustainability and recycling
+  "How 1-800-GOT-JUNK Handles Recycling",
+  "What Happens to Your Junk After Removal?",
+  "How to Dispose of E-Waste Responsibly",
+  "Eco-Friendly Junk Removal Options",
+  "How to Donate Usable Items Instead of Trashing Them",
+  "Best Charities That Accept Furniture Donations",
+  "Best Charities That Pick Up Your Donations",
+  "How to Recycle Old Appliances",
+  "How to Reduce Junk Before It Accumulates",
+  "Zero Waste Home Cleanout: Is It Possible?",
+
+  // DIY and budget
+  "How to Rent a Dumpster: Step-by-Step Guide",
+  "Bagster vs Dumpster vs Junk Removal: Which to Choose?",
+  "How to Haul Junk Yourself and Save Money",
+  "Renting a Pickup Truck for Junk Removal",
+  "Free Ways to Get Rid of Unwanted Stuff",
+  "Apps to Sell Old Furniture and Junk Online",
+  "Facebook Marketplace Tips for Getting Rid of Stuff",
+  "Craigslist Free Section: How to Use It",
+  "How to Host a Successful Garage Sale",
+  "Estate Sale Companies: Are They Worth It?",
+
+  // Health and safety
+  "Junk Removal and Mold: What You Should Know",
+  "Asbestos in Old Junk: What to Do",
+  "Lead Paint Disposal: Safety Guide",
+  "How to Safely Remove Old Insulation",
+  "Chemical Disposal Safety Tips",
+  "Biohazard Cleanout: When to Call Professionals",
+  "How to Safely Dispose of Old Medications",
+  "Sharp Object Disposal Safety Guide",
+  "Heavy Item Safety: Preventing Injury During Cleanup",
+  "When to Hire Professionals vs DIY Junk Removal",
+
+  // Emotional and lifestyle
+  "The Psychology of Clutter: Why We Keep Stuff",
+  "How Decluttering Improves Mental Health",
+  "The Benefits of a Clean Home",
+  "How Clutter Affects Your Sleep",
+  "How to Stop Accumulating Junk",
+  "Minimalism vs Decluttering: Key Differences",
+  "How to Teach Kids to Declutter",
+  "Decluttering as Self-Care",
+  "The Emotional Difficulty of Getting Rid of Stuff",
+  "How to Feel Good About Throwing Things Away",
+
+  // FAQ-style articles
+  "Is Junk Removal Worth the Cost?",
+  "How Long Does Junk Removal Take?",
+  "Do I Need to Be Home for Junk Removal?",
+  "Can Junk Removal Companies Take Everything at Once?",
+  "What Happens if Junk Removal Damages My Property?",
+  "Do Junk Removal Companies Give Free Estimates?",
+  "How Far in Advance Should I Book Junk Removal?",
+  "Is Junk Removal Available on Weekends?",
+  "Can I Schedule Recurring Junk Removal?",
+  "What Is the Heaviest Item Junk Removal Will Take?",
+  "Does Junk Removal Include Labor?",
+  "Will Junk Removal Go Into My Home?",
+  "Can Junk Removal Help with Entire House Cleanouts?",
+  "Do Junk Removal Companies Separate Recyclables?",
+  "What Do I Do If I'm Not Satisfied with Junk Removal?",
+  "How Do I Complain About a Junk Removal Company?",
+  "Are Junk Removal Companies Licensed?",
+  "Do Junk Removal Companies Need Insurance?",
+  "What Is Junk Removal Liability?",
+  "How Do I Leave a Review for 1-800-GOT-JUNK?",
+
+  // Trending and informational
+  "The Junk Removal Industry: How Big Is It?",
+  "History of 1-800-GOT-JUNK",
+  "Who Founded 1-800-GOT-JUNK?",
+  "1-800-GOT-JUNK Franchise: How It Works",
+  "How Much Does a 1-800-GOT-JUNK Franchise Cost?",
+  "1-800-GOT-JUNK Revenue: How Big Is the Company?",
+  "1-800-GOT-JUNK Truck: Inside Look",
+  "1-800-GOT-JUNK Uniforms: Why They Matter",
+  "1-800-GOT-JUNK Marketing: How They Built a Brand",
+  "Future of Junk Removal: Where the Industry Is Headed",
+
+  // More comparisons
+  "Junk King Review: Is It Better Than 1-800-GOT-JUNK?",
+  "LoadUp Review: How Does It Compare?",
+  "College Hunks Review: Worth the Price?",
+  "Junkluggers Review: Eco-Friendly Alternative?",
+  "Trash Gators Review",
+  "1-800-GOT-JUNK vs Junkluggers: Which Is Greener?",
+  "1-800-GOT-JUNK vs Trash Gators: Comparison",
+  "Best Junk Removal Companies Ranked",
+  "Cheapest Junk Removal Services Compared",
+  "Best Eco-Friendly Junk Removal Services",
+
+  // More niche
+  "How to Remove a Hot Tub Without a Crane",
+  "Piano Removal: What You Need to Know",
+  "Safe Removal: What to Do",
+  "Boat Removal and Disposal Guide",
+  "RV and Camper Disposal Options",
+  "How to Get Rid of an Old Car",
+  "Scrap Metal Removal and Recycling Guide",
+  "How to Dispose of Old Lumber and Wood",
+  "Brick and Concrete Disposal Guide",
+  "Drywall Removal and Disposal",
+  "Carpet Removal and Disposal Guide",
+  "Tile Removal and Debris Disposal",
+  "How to Dispose of Old Insulation Safely",
+  "Basement Waterproofing Debris Removal",
+  "How to Clean Out a Crawl Space",
+  "Attic Insulation Removal Guide",
+  "Chimney Cleanout and Debris Removal",
+  "Gutters and Downspout Disposal",
+  "Landscaping Debris Removal Guide",
+  "Tree Stump and Branch Removal",
+
+  // Bonus final stretch
+  "How to Organize a Community Cleanup Event",
+  "Neighborhood Junk Removal Programs",
+  "Free Bulk Pickup Days: How to Find Them",
+  "How to Request Bulk Pickup from Your City",
+  "Municipality Junk Programs vs Private Services",
+  "How to Appeal for Free Junk Removal Assistance",
+  "Junk Removal for Low-Income Households",
+  "Senior Junk Removal Discounts and Programs",
+  "Veteran Junk Removal Discounts",
+  "Student Discounts on Junk Removal Services",
+];
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+async function generateArticle(groq: Groq, topic: string, index: number): Promise<void> {
+  const slug = slugify(topic);
+  const outPath = path.join("content", "articles", `${slug}.json`);
+
+  if (fs.existsSync(outPath)) {
+    const existing = JSON.parse(fs.readFileSync(outPath, "utf-8"));
+    if (!existing.error) {
+      console.log(`[${index + 1}/500] SKIP: ${topic}`);
+      return;
+    }
+    fs.unlinkSync(outPath); // delete error file, retry
+  }
+
+  const prompt = `Write a comprehensive, SEO-optimized article titled "${topic}" for a website about 1-800-GOT-JUNK?, the junk removal service.
+
+REQUIREMENTS:
+- 800-1200 words
+- Conversational but helpful tone
+- Naturally mention "1-800-GOT-JUNK?" throughout
+- Include H1, H2, H3 sections and short paragraphs
+- Include at least 3 [CTA] placeholders where affiliate links go
+- First line: META: <120-160 char meta description>
+- Second line: KEYWORDS: keyword1, keyword2, keyword3, keyword4, keyword5
+- Write in HTML with proper h1, h2, h3, p, ul, li tags
+- [CTA] placeholder text: "Get a Free Quote from 1-800-GOT-JUNK?" or "Book 1-800-GOT-JUNK Now"
+- Do NOT include actual URLs — use [CTA] only
+- Make content genuinely useful to someone searching this topic
+
+Article title: ${topic}`;
+
+  try {
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 2000,
+      temperature: 0.8,
+    });
+
+    const content = completion.choices[0]?.message?.content ?? "";
+    const metaMatch = content.match(/META:\s*(.+)/);
+    const kwMatch = content.match(/KEYWORDS:\s*(.+)/);
+    const metaDescription = metaMatch ? metaMatch[1].trim() : `Learn about ${topic} and how 1-800-GOT-JUNK? can help.`;
+    const keywords = kwMatch ? kwMatch[1].split(",").map((k) => k.trim()) : ["1-800-GOT-JUNK", "junk removal", "junk pickup"];
+
+    const body = content
+      .replace(/META:\s*.+\n?/, "")
+      .replace(/KEYWORDS:\s*.+\n?/, "")
+      .replace(/\[CTA\]/g, `<a href="${AFFILIATE}" class="cta-link">Get a Free Quote from 1-800-GOT-JUNK? →</a>`);
+
+    const article = { slug, title: topic, metaDescription, keywords, body, generatedAt: new Date().toISOString() };
+
+    // Write without BOM using Buffer
+    const json = JSON.stringify(article, null, 2);
+    fs.writeFileSync(outPath, Buffer.from(json, "utf-8"));
+    console.log(`[${index + 1}/500] DONE: ${topic}`);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(`[${index + 1}/500] ERROR: ${topic} — ${msg}`);
+    const errArticle = { slug, title: topic, metaDescription: "", keywords: [], body: "", generatedAt: new Date().toISOString(), error: msg };
+    fs.writeFileSync(outPath, Buffer.from(JSON.stringify(errArticle, null, 2), "utf-8"));
+  }
+
+  await new Promise((r) => setTimeout(r, 13000));
+}
+
+async function main() {
+  // Load keys from .env.local
+  const envPath = path.join(process.cwd(), ".env.local");
+  if (fs.existsSync(envPath)) {
+    fs.readFileSync(envPath, "utf-8").split("\n").forEach((line) => {
+      const [k, v] = line.split("=");
+      if (k && v) process.env[k.trim()] = v.trim();
+    });
+  }
+
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) { console.error("ERROR: GROQ_API_KEY not set in .env.local"); process.exit(1); }
+
+  const groq = new Groq({ apiKey });
+  fs.mkdirSync(path.join("content", "articles"), { recursive: true });
+
+  console.log(`Generating ${ARTICLE_TOPICS.length} articles sequentially...`);
+  for (let i = 0; i < ARTICLE_TOPICS.length; i++) {
+    await generateArticle(groq, ARTICLE_TOPICS[i], i);
+  }
+  console.log("Done! All articles generated.");
+}
+
+main().catch(console.error);
