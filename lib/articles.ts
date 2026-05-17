@@ -18,10 +18,14 @@ export interface Article {
 const ARTICLES_DIR = path.join(process.cwd(), "content", "articles");
 
 function processBody(raw: string): string {
-  // Strip META and KEYWORDS lines
+  // Strip META/KEYWORDS in all formats Cerebras/Groq might output
   let body = raw
-    .replace(/^META:.*$/gm, "")
-    .replace(/^KEYWORDS:.*$/gm, "")
+    .replace(/^\*?\*?Meta Description:?\*?\*?.*$/gim, "")
+    .replace(/^\*?\*?Keywords?:?\*?\*?.*$/gim, "")
+    .replace(/^META:.*$/gim, "")
+    .replace(/^KEYWORDS?:.*$/gim, "")
+    .replace(/^\*?\*?SEO Meta Description:?\*?\*?.*$/gim, "")
+    .replace(/^\*?\*?Focus Keywords?:?\*?\*?.*$/gim, "")
     .trim();
 
   // Always parse as markdown (handles both HTML and markdown output from AI)
