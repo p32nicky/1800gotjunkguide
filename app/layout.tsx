@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: { siteName: "1800GotJunk Guide", type: "website", locale: "en_US" },
   twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
-  ...(process.env.NEXT_PUBLIC_GSC_ID ? { verification: { google: process.env.NEXT_PUBLIC_GSC_ID } } : {}),
+  verification: { google: "rExqKrlIUHf3C8lAuDKtsLeQVUqIIZ_IaHXKvClNwrQ" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
