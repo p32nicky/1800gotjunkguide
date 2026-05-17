@@ -4,6 +4,6 @@
   "metaDescription": "",
   "keywords": [],
   "body": "",
-  "generatedAt": "2026-05-17T15:14:27.309Z",
-  "error": "429 {\"error\":{\"message\":\"Rate limit reached for model `llama-3.3-70b-versatile` in organization `org_01kr6z3sjgecs8shrayk681re9` service tier `on_demand` on tokens per day (TPD): Limit 100000, Used 99465, Requested 2268. Please try again in 24m57.312s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing\",\"type\":\"tokens\",\"code\":\"rate_limit_exceeded\"}}"
+  "generatedAt": "2026-05-17T15:29:34.651Z",
+  "error": "429 Requests per hour limit exceeded - too many requests sent."
 }

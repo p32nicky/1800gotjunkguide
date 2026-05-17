@@ -4,8 +4,11 @@
  */
 
 import Groq from "groq-sdk";
+import Cerebras from "@cerebras/cerebras_cloud_sdk";
 import fs from "fs";
 import path from "path";
+
+let useGroq = true; // flips to false when Groq quota exhausted
 
 const AFFILIATE = "https://click.linksynergy.com/fs-bin/click?id=EWtL65s2/tg&offerid=1950775.2&type=3&subid=0";
 
@@ -387,7 +390,7 @@ function slugify(text: string): string {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-async function generateArticle(groq: Groq, topic: string, index: number): Promise<void> {
+async function generateArticle(groq: Groq, cerebras: Cerebras, topic: string, index: number): Promise<void> {
   const slug = slugify(topic);
   const outPath = path.join("content", "articles", `${slug}.json`);
 
@@ -418,14 +421,39 @@ REQUIREMENTS:
 Article title: ${topic}`;
 
   try {
-    const completion = await groq.chat.completions.create({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 2000,
-      temperature: 0.8,
-    });
+    let content = "";
 
-    const content = completion.choices[0]?.message?.content ?? "";
+    if (useGroq) {
+      try {
+        const completion = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 2000,
+          temperature: 0.8,
+        });
+        content = completion.choices[0]?.message?.content ?? "";
+      } catch (groqErr: unknown) {
+        const msg = String(groqErr);
+        if (msg.includes("429") || msg.includes("rate_limit") || msg.includes("tokens per day")) {
+          console.log("Groq quota hit -- switching to Cerebras");
+          useGroq = false;
+        } else {
+          throw groqErr;
+        }
+      }
+    }
+
+    if (!useGroq || !content) {
+      const completion = await cerebras.chat.completions.create({
+        model: "llama3.1-8b",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 2000,
+        // @ts-ignore
+        temperature: 0.8,
+      });
+      content = (completion.choices[0]?.message?.content as string) ?? "";
+      if (!useGroq) console.log(`[${index + 1}/500] Cerebras: ${topic}`);
+    }
     const metaMatch = content.match(/META:\s*(.+)/);
     const kwMatch = content.match(/KEYWORDS:\s*(.+)/);
     const metaDescription = metaMatch ? metaMatch[1].trim() : `Learn about ${topic} and how 1-800-GOT-JUNK? can help.`;
@@ -462,15 +490,21 @@ async function main() {
     });
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
-  if (!apiKey) { console.error("ERROR: GROQ_API_KEY not set in .env.local"); process.exit(1); }
+  const groqKey = process.env.GROQ_API_KEY;
+  const cerebrasKey = process.env.CEREBRAS_API_KEY;
 
-  const groq = new Groq({ apiKey });
+  if (!groqKey && !cerebrasKey) { console.error("ERROR: Set GROQ_API_KEY and/or CEREBRAS_API_KEY in .env.local"); process.exit(1); }
+  if (!groqKey) { useGroq = false; console.log("No Groq key -- using Cerebras only"); }
+  if (!cerebrasKey) console.log("No Cerebras key -- Groq only, no fallback");
+
+  const groq = new Groq({ apiKey: groqKey ?? "none" });
+  const cerebras = new Cerebras({ apiKey: cerebrasKey ?? "none" });
+
   fs.mkdirSync(path.join("content", "articles"), { recursive: true });
 
   console.log(`Generating ${ARTICLE_TOPICS.length} articles sequentially...`);
   for (let i = 0; i < ARTICLE_TOPICS.length; i++) {
-    await generateArticle(groq, ARTICLE_TOPICS[i], i);
+    await generateArticle(groq, cerebras, ARTICLE_TOPICS[i], i);
   }
   console.log("Done! All articles generated.");
 }
