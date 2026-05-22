@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  name: "1800GotJunk Guide",
+  name: "Junk Removal Guide",
   url: "https://junkremovalguide.online",
   description: "Honest reviews, pricing guides, and tips for 1-800-GOT-JUNK? junk removal service.",
   potentialAction: {
@@ -25,7 +25,7 @@ const websiteJsonLd = {
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "1800GotJunk Guide",
+  name: "Junk Removal Guide",
   url: "https://junkremovalguide.online",
 };
 
