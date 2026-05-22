@@ -13,11 +13,11 @@ const websiteJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "1800GotJunk Guide",
-  url: "https://1800gotjunksite.vercel.app",
+  url: "https://junkremovalguide.online",
   description: "Honest reviews, pricing guides, and tips for 1-800-GOT-JUNK? junk removal service.",
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://1800gotjunksite.vercel.app/?q={search_term_string}",
+    target: "https://junkremovalguide.online/?q={search_term_string}",
     "query-input": "required name=search_term_string",
   },
 };
@@ -26,7 +26,7 @@ const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "1800GotJunk Guide",
-  url: "https://1800gotjunksite.vercel.app",
+  url: "https://junkremovalguide.online",
 };
 
 export default function HomePage() {
