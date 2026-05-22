@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 const AFFILIATE = "https://click.linksynergy.com/fs-bin/click?id=EWtL65s2/tg&offerid=1950775.2&type=3&subid=0";
-const SITE = "https://1800gotjunksite.vercel.app";
+const SITE = "https://junkremovalguide.online";
 
 interface Props { params: Promise<{ slug: string }> }
 
