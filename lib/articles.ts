@@ -70,3 +70,22 @@ export function getAllSlugs(): string[] {
   if (!fs.existsSync(ARTICLES_DIR)) return [];
   return fs.readdirSync(ARTICLES_DIR).filter((f) => f.endsWith(".json")).map((f) => f.replace(".json", ""));
 }
+
+export interface ArticleSummary {
+  slug: string;
+  title: string;
+  metaDescription: string;
+  generatedAt: string;
+}
+
+// Lightweight listing — skips markdown processing of bodies
+export function getArticleSummaries(): ArticleSummary[] {
+  if (!fs.existsSync(ARTICLES_DIR)) return [];
+  return fs
+    .readdirSync(ARTICLES_DIR)
+    .filter((f) => f.endsWith(".json"))
+    .map((f) => JSON.parse(fs.readFileSync(path.join(ARTICLES_DIR, f), "utf-8")) as Article)
+    .filter((a) => !a.error)
+    .map(({ slug, title, metaDescription, generatedAt }) => ({ slug, title, metaDescription, generatedAt }))
+    .sort((a, b) => a.title.localeCompare(b.title));
+}

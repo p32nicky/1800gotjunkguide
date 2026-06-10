@@ -41,8 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>{children}</main>
         <footer className="border-t border-gray-100 mt-16 py-8 text-center text-sm text-gray-500">
           <p>Junk Removal Guide is an independent review site. We may earn a commission when you use our links.</p>
-          <p className="mt-2 flex items-center justify-center gap-4">
+          <p className="mt-2 flex items-center justify-center gap-4 flex-wrap">
             <a href="/" className="underline hover:text-gray-700">All Guides</a>
+            <a href="/pricing" className="underline hover:text-gray-700">Pricing Guide</a>
+            <a href="/about" className="underline hover:text-gray-700">About</a>
             <a href="/affiliate-disclosure" className="underline hover:text-gray-700">Affiliate Disclosure</a>
             <a href="/privacy-policy" className="underline hover:text-gray-700">Privacy Policy</a>
           </p>

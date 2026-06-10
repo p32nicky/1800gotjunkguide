@@ -1,6 +1,19 @@
-import { getArticleBySlug, getAllSlugs } from "@/lib/articles";
+import { getArticleBySlug, getAllSlugs, getArticleSummaries } from "@/lib/articles";
+import { categorize } from "@/lib/categories";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+
+function getRelated(slug: string, title: string, count = 6) {
+  const all = getArticleSummaries().filter((a) => a.slug !== slug);
+  const cat = categorize(title).slug;
+  const sameCat = all.filter((a) => categorize(a.title).slug === cat);
+  const pool = sameCat.length >= count ? sameCat : all;
+  // deterministic shuffle seeded by slug — stable across builds
+  const seed = slug.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return [...pool]
+    .sort((a, b) => ((seed * 31 + a.slug.length) % 97) - ((seed * 31 + b.slug.length + 1) % 97))
+    .slice(0, count);
+}
 
 const AFFILIATE = "https://click.linksynergy.com/fs-bin/click?id=EWtL65s2/tg&offerid=1950775.2&type=3&subid=0";
 const SITE = "https://junkremovalguide.online";
@@ -28,6 +41,7 @@ export default async function ArticlePage({ params }: Props) {
   const { slug } = await params;
   const article = getArticleBySlug(slug);
   if (!article) notFound();
+  const related = getRelated(slug, article.title);
 
   const articleJsonLd = {
     "@context": "https://schema.org", "@type": "Article",
@@ -82,6 +96,20 @@ export default async function ArticlePage({ params }: Props) {
           </a>
           <p className="text-xs text-green-200 mt-3">Free quote. No obligation. Same-day service available.</p>
         </div>
+
+        {related.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Related Guides</h2>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {related.map((r) => (
+                <a key={r.slug} href={`/articles/${r.slug}`}
+                  className="block p-4 border border-gray-200 rounded-xl hover:border-green-300 hover:shadow-sm transition-all group">
+                  <p className="font-medium text-sm text-gray-900 group-hover:text-green-600 leading-snug">{r.title}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-8 text-center">
           <a href="/" className="text-sm text-gray-500 hover:text-gray-700 underline">← All junk removal guides</a>
