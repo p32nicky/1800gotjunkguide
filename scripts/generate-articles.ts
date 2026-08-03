@@ -714,20 +714,60 @@ async function generateArticle(groq: Groq, cerebras: Cerebras, topic: string, in
     fs.unlinkSync(outPath); // delete error file, retry
   }
 
-  const prompt = `Write a comprehensive, SEO-optimized article titled "${topic}" for a website about 1-800-GOT-JUNK?, the junk removal service.
+  const prompt = `Write a DEEP, AUTHORITATIVE, SEO-optimized article for someone genuinely searching "${topic}".
 
-REQUIREMENTS:
-- 800-1200 words
-- Conversational but helpful tone
-- Naturally mention "1-800-GOT-JUNK?" throughout
-- Include H1, H2, H3 sections and short paragraphs
-- Include at least 3 [CTA] placeholders where affiliate links go
-- First line: META: <120-160 char meta description>
-- Second line: KEYWORDS: keyword1, keyword2, keyword3, keyword4, keyword5
-- Write in HTML with proper h1, h2, h3, p, ul, li tags
-- [CTA] placeholder text: "Get a Free Quote from 1-800-GOT-JUNK?" or "Book 1-800-GOT-JUNK Now"
-- Do NOT include actual URLs — use [CTA] only
-- Make content genuinely useful to someone searching this topic
+THIS ARTICLE MUST:
+- Be 2000-2500 words (NOT less)
+- Answer ALL user questions completely. No surface-level content.
+- Include specific examples, comparisons, real scenarios, and data points
+- Build trust through expertise and helpfulness, NOT affiliate links
+- Be scannable: short paragraphs (2-3 sentences max), lots of subheadings, bullet lists, bold key terms
+
+STRUCTURE (REQUIRED):
+1. H1: "${topic}"
+2. Intro paragraph: Hook the reader, state what they'll learn
+3. 4-5 detailed H2 sections with real depth (each 300-400 words)
+   - Use H3 subsections for clarity
+   - Include comparisons, pros/cons, examples, real scenarios
+   - Mention 1-800-GOT-JUNK? naturally when relevant (not forced)
+4. FAQ section with 4-6 real questions people ask
+5. Conclusion with clear takeaway
+
+CONTENT QUALITY:
+- Write for someone who will CLICK because content is genuinely useful
+- Include real numbers, pricing ranges, time estimates when relevant
+- Compare options (not just promote 1-800-GOT-JUNK?)
+- Address common mistakes, misconceptions, concerns
+- Use concrete examples (specific items, scenarios, locations)
+- Make it feel like expert advice, not a sales page
+
+TONE:
+- Helpful, trustworthy expert (like a friend who knows junk removal)
+- Honest about 1-800-GOT-JUNK? (pros AND cons, not just promotion)
+- Clear, practical, actionable advice
+
+FORMATTING:
+- Keep paragraphs SHORT (2-3 sentences)
+- Use BULLET POINTS for lists
+- Use **bold** for important terms
+- Use H3 for subpoints within H2 sections
+- Break up text visually — no huge paragraphs
+- Good for mobile reading
+
+META/KEYWORDS:
+- First line: META: <compelling 120-160 char meta description that makes people click>
+- Second line: KEYWORDS: 5 high-value keywords for this topic
+
+CTA:
+- Include only 1-2 [CTA] placeholders (NOT 3+)
+- Place naturally at relevant moments (not every section)
+- Example: "Ready to book? [CTA]" or "Want a free quote? [CTA]"
+
+CRITICAL:
+- Do NOT write thin, fluffy content
+- Do NOT oversell 1-800-GOT-JUNK?
+- DO write content Google will love AND users will find genuinely helpful
+- Your goal: 0% CTR → 3-4% CTR through better content
 
 Article title: ${topic}`;
 
@@ -756,7 +796,7 @@ Article title: ${topic}`;
 
     if (!useGroq || !content) {
       const completion = await cerebras.chat.completions.create({
-        model: "llama3.1-8b",
+        model: "gpt-oss-120b",
         messages: [{ role: "user", content: prompt }],
         max_tokens: 2000,
         // @ts-ignore
