@@ -777,20 +777,16 @@ Article title: ${topic}`;
     if (useGroq) {
       try {
         const completion = await groq.chat.completions.create({
-          model: "llama-3.3-70b-versatile",
+          model: "openai/gpt-oss-120b",
           messages: [{ role: "user", content: prompt }],
           max_tokens: 2000,
           temperature: 0.8,
         });
         content = completion.choices[0]?.message?.content ?? "";
       } catch (groqErr: unknown) {
-        const msg = String(groqErr);
-        if (msg.includes("429") || msg.includes("rate_limit") || msg.includes("tokens per day")) {
-          console.log("Groq quota hit -- switching to Cerebras");
-          useGroq = false;
-        } else {
-          throw groqErr;
-        }
+        // Any Groq failure falls through to Cerebras -- see note above.
+        console.log(`Groq unavailable (${String(groqErr).slice(0, 120)}) -- switching to Cerebras`);
+        useGroq = false;
       }
     }
 

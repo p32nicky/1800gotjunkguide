@@ -16,7 +16,15 @@ VERIFIED PRICING DATA — use these real numbers. Do NOT invent different ones.
 - Half truckload: $400-$600
 - Full truckload: $600-$1,000
 - Average job across all customers: about $240
-- Single-item examples: sofa ~$170, loveseat ~$100, refrigerator ~$115
+- Single-item removals overall: $70-$400 depending on bulk and weight
+- Mattress: $70-$100
+- Sofa / couch: sources range $59-$170 -- it genuinely varies by zip code and
+  market, so give the range and say the on-site estimate settles it
+- Loveseat: ~$100
+- Refrigerator / large appliance: ~$115
+- Mattress recycling fee: California, Connecticut and Rhode Island mandate a
+  $10.50-per-unit fee under the Bye Bye Mattress program in 2026, and
+  1-800-GOT-JUNK may pass it through in those states
 
 Truck dimensions (official):
 - Minimum load: 1.25ft long x 5ft high x 8ft wide
@@ -39,8 +47,9 @@ DISCOUNTS — THE HONEST TRUTH (this is important, most sites lie about this):
 - There is NO official senior discount.
 - There is NO official student discount.
 - There is NO official AAA discount.
-- The coupon aggregator sites listing codes like "MYJUNK30" are publishing
-  unverified or expired codes. Most do not work at checkout. Say so plainly.
+- Coupon aggregator sites publish unverified or expired codes that mostly do
+  not work at checkout. Say so plainly, but NEVER name a specific code -- none
+  can be verified, and naming one lends it credibility it has not earned.
 - What DOES work: joining the email list via the popup or footer form on
   their homepage gets you $10-$25 off codes. Individual franchises sometimes
   run local seasonal promotions.

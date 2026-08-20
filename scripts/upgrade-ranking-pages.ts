@@ -209,18 +209,18 @@ async function upgrade(groq: Groq, cerebras: Cerebras, t: Target, i: number) {
     if (useGroq) {
       try {
         const c = await groq.chat.completions.create({
-          model: "llama-3.3-70b-versatile",
+          model: "openai/gpt-oss-120b",
           messages: [{ role: "user", content: prompt }],
           max_tokens: 6000,
           temperature: 0.7,
         });
         content = c.choices[0]?.message?.content ?? "";
       } catch (e: unknown) {
-        const msg = String(e);
-        if (msg.includes("429") || msg.includes("rate_limit") || msg.includes("tokens per day")) {
-          console.log("Groq quota hit -- switching to Cerebras");
-          useGroq = false;
-        } else throw e;
+        // Any Groq failure -- quota, decommissioned model, outage -- falls
+        // through to Cerebras. Groq retires model IDs without notice, and a
+        // narrow 429-only guard silently failed a whole 44-article batch.
+        console.log(`Groq unavailable (${String(e).slice(0, 120)}) -- switching to Cerebras`);
+        useGroq = false;
       }
     }
 
