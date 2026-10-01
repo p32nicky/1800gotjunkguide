@@ -46,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <a href="/" className="underline hover:text-gray-700">All Guides</a>
             <a href="/pricing" className="underline hover:text-gray-700">Pricing Guide</a>
             <a href="/about" className="underline hover:text-gray-700">About</a>
+            <a href="/contact" className="underline hover:text-gray-700">Contact</a>
             <a href="/affiliate-disclosure" className="underline hover:text-gray-700">Affiliate Disclosure</a>
             <a href="/privacy-policy" className="underline hover:text-gray-700">Privacy Policy</a>
           </p>
